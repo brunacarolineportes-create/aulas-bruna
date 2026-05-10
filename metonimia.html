@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metonímia — 6º Ano</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFD93D;
+    --orange: #FF6B35;
+    --purple: #6C63FF;
+    --pink: #FF4D8D;
+    --green: #06D6A0;
+    --dark: #1A1A2E;
+    --light: #F8F5FF;
+    --white: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--dark);
+    color: var(--white);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--yellow), var(--orange), var(--pink));
+    transition: width 0.5s ease;
+    z-index: 999;
+  }
+
+  /* ── SLIDE COUNTER ── */
+  #counter {
+    position: fixed;
+    bottom: 24px; right: 28px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.4);
+    z-index: 999;
+    letter-spacing: 1px;
+  }
+
+  /* ── NAV BUTTONS ── */
+  .nav {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 14px;
+    z-index: 999;
+  }
+  .nav button {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    padding: 10px 28px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.2s;
+    letter-spacing: 1px;
+  }
+  .nav button:hover { transform: scale(1.07); }
+  #btn-prev { background: rgba(255,255,255,0.12); color: var(--white); }
+  #btn-next { background: var(--yellow); color: var(--dark); }
+
+  /* ── SLIDES CONTAINER ── */
+  #slides { width: 100vw; height: 100vh; position: relative; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px 40px 90px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: translateY(30px);
+  }
+  .slide.active {
+    opacity: 1; pointer-events: all;
+    transform: translateY(0);
+  }
+
+  /* ── TYPOGRAPHY ── */
+  .slide-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    text-align: center;
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  .slide-sub {
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    text-align: center;
+    opacity: 0.85;
+    font-weight: 600;
+    max-width: 700px;
+  }
+
+  /* ══════════════════════════════
+     SLIDE 1 — CAPA
+  ══════════════════════════════ */
+  #s1 {
+    background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+  }
+  .capa-emoji {
+    font-size: 5rem;
+    animation: float 3s ease-in-out infinite;
+    margin-bottom: 10px;
+  }
+  @keyframes float {
+    0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)}
+  }
+  .capa-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(3.5rem, 9vw, 7rem);
+    background: linear-gradient(135deg, var(--yellow), var(--orange), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+    text-align: center;
+  }
+  .capa-tag {
+    margin-top: 18px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 10px 28px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    backdrop-filter: blur(10px);
+  }
+  .capa-fala {
+    margin-top: 30px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    padding: 16px 30px;
+    border-radius: 20px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-align: center;
+    max-width: 600px;
+    box-shadow: 0 8px 32px rgba(108,99,255,0.4);
+  }
+
+  /* ══════════════════════════════
+     SLIDE 2 — QUEBRA-GELO
+  ══════════════════════════════ */
+  #s2 { background: linear-gradient(135deg, #0D1B2A, #1B263B); }
+  .frases-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin: 24px 0; max-width: 680px; width: 100%;
+  }
+  .frase-card {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 18px; padding: 18px 22px;
+    font-size: 1.05rem; font-weight: 700;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .frase-card:hover, .frase-card.selected {
+    border-color: var(--yellow);
+    background: rgba(255,217,61,0.15);
+    transform: scale(1.03);
+    color: var(--yellow);
+  }
+  .reveal-box {
+    background: linear-gradient(135deg, var(--green), #04A77A);
+    padding: 16px 30px; border-radius: 16px;
+    font-size: 1.1rem; font-weight: 800;
+    text-align: center; color: var(--dark);
+    display: none; margin-top: 10px;
+    animation: popIn 0.4s ease;
+  }
+  .reveal-box.show { display: block; }
+  @keyframes popIn {
+    0%{transform:scale(0.7);opacity:0} 100%{transform:scale(1);opacity:1}
+  }
+  #reveal-btn {
+    margin-top: 14px;
+    font-family: 'Fredoka One', cursive;
+    background: var(--orange);
+    color: white;
+    border: none; padding: 12px 30px;
+    border-radius: 50px; font-size: 1rem;
+    cursor: pointer; transition: transform 0.2s;
+  }
+  #reveal-btn:hover { transform: scale(1.05); }
+
+  /* ══════════════════════════════
+     SLIDE 3 — O QUE É?
+  ══════════════════════════════ */
+  #s3 { background: linear-gradient(135deg, #1A0533, #2D1B69); }
+  .def-box {
+    background: rgba(108,99,255,0.2);
+    border: 2px solid var(--purple);
+    border-radius: 24px; padding: 28px 36px;
+    max-width: 640px; text-align: center;
+    font-size: 1.2rem; font-weight: 700;
+    line-height: 1.6; margin: 20px 0;
+  }
+  .exemplo-chain {
+    display: flex; align-items: center; gap: 16px;
+    flex-wrap: wrap; justify-content: center;
+    margin-top: 20px;
+  }
+  .chain-item {
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 20px 26px;
+    text-align: center; font-weight: 700;
+    font-size: 1rem;
+  }
+  .chain-item span { font-size: 2.2rem; display: block; margin-bottom: 8px; }
+  .chain-item.striked { text-decoration: line-through; opacity: 0.5; }
+  .chain-arrow { font-size: 2rem; color: var(--yellow); font-weight: 900; }
+
+  /* ══════════════════════════════
+     SLIDE 4 — EXPLICAÇÃO VISUAL
+  ══════════════════════════════ */
+  #s4 { background: linear-gradient(135deg, #0A2342, #1B4F72); }
+  .visual-split {
+    display: flex; align-items: center; gap: 20px;
+    flex-wrap: wrap; justify-content: center;
+    margin: 24px 0;
+  }
+  .visual-card {
+    background: rgba(255,255,255,0.08);
+    border-radius: 24px; padding: 30px 36px;
+    text-align: center; min-width: 160px;
+    border: 2px solid rgba(255,255,255,0.15);
+  }
+  .visual-card .v-emoji { font-size: 4rem; }
+  .visual-card .v-label { font-family: 'Fredoka One', cursive; font-size: 1.1rem; margin-top: 10px; }
+  .visual-middle {
+    text-align: center; color: var(--yellow);
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 16px;
+  }
+  .visual-middle .arrow { font-size: 3rem; display: block; }
+  .swap-label {
+    background: var(--yellow); color: var(--dark);
+    padding: 12px 24px; border-radius: 50px;
+    font-weight: 800; font-size: 1rem;
+    margin-top: 16px; display: inline-block;
+  }
+
+  /* ══════════════════════════════
+     SLIDE 5 — TIPOS
+  ══════════════════════════════ */
+  #s5 { background: linear-gradient(135deg, #1A2A0D, #2D4A1E); }
+  .tipos-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; max-width: 700px; width: 100%; margin-top: 20px;
+  }
+  .tipo-card {
+    background: rgba(255,255,255,0.07);
+    border-radius: 20px; padding: 20px 22px;
+    border-left: 5px solid var(--green);
+    transition: transform 0.2s;
+  }
+  .tipo-card:hover { transform: translateX(6px); }
+  .tipo-card .t-head { font-family: 'Fredoka One', cursive; font-size: 1rem; color: var(--green); margin-bottom: 6px; }
+  .tipo-card .t-ex { font-size: 0.95rem; opacity: 0.85; font-style: italic; }
+  .tipo-card:nth-child(2) { border-color: var(--yellow); }
+  .tipo-card:nth-child(2) .t-head { color: var(--yellow); }
+  .tipo-card:nth-child(3) { border-color: var(--pink); }
+  .tipo-card:nth-child(3) .t-head { color: var(--pink); }
+  .tipo-card:nth-child(4) { border-color: var(--purple); }
+  .tipo-card:nth-child(4) .t-head { color: var(--purple); }
+
+  /* ══════════════════════════════
+     SLIDE 6 — DETETIVES
+  ══════════════════════════════ */
+  #s6 { background: linear-gradient(135deg, #1C1200, #3D2800); }
+  .detetive-cards { display: flex; flex-direction: column; gap: 14px; max-width: 600px; width: 100%; margin-top: 18px; }
+  .det-card {
+    background: rgba(255,255,255,0.06);
+    border-radius: 18px; padding: 18px 24px;
+    border: 2px solid rgba(255,165,0,0.3);
+    cursor: pointer; transition: all 0.3s;
+  }
+  .det-card .det-frase { font-size: 1.05rem; font-weight: 700; }
+  .det-card .det-resp {
+    color: var(--yellow); font-size: 0.9rem;
+    margin-top: 8px; display: none; font-weight: 600;
+  }
+  .det-card.revealed { border-color: var(--yellow); background: rgba(255,217,61,0.1); }
+  .det-card.revealed .det-resp { display: block; animation: popIn 0.3s; }
+  .tap-hint { font-size: 0.85rem; opacity: 0.5; margin-top: 12px; }
+
+  /* ══════════════════════════════
+     SLIDE 7 — MEME
+  ══════════════════════════════ */
+  #s7 { background: linear-gradient(135deg, #1A0020, #36004D); }
+  .meme-box {
+    background: white; color: #222;
+    border-radius: 24px; padding: 36px 40px;
+    max-width: 520px; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .meme-box::before {
+    content: 'MEME DO DIA';
+    position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+    background: var(--pink); color: white;
+    padding: 5px 18px; border-radius: 50px;
+    font-family: 'Fredoka One', cursive; font-size: 0.9rem;
+    letter-spacing: 2px;
+  }
+  .meme-person { font-size: 4rem; }
+  .meme-text { font-family: 'Fredoka One', cursive; font-size: 1.3rem; margin: 10px 0; color: #333; }
+  .meme-react { font-size: 2.5rem; margin: 14px 0; }
+  .meme-resp { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: #555; }
+  .meme-explic {
+    margin-top: 20px; background: rgba(255,77,141,0.15);
+    border: 2px solid var(--pink);
+    border-radius: 16px; padding: 14px 22px;
+    font-weight: 700; font-size: 1rem;
+  }
+
+  /* ══════════════════════════════
+     SLIDE 8 — JOGO
+  ══════════════════════════════ */
+  #s8 { background: linear-gradient(135deg, #002233, #003D5C); }
+  .jogo-items { display: flex; flex-direction: column; gap: 12px; max-width: 620px; width: 100%; margin-top: 18px; }
+  .jogo-item {
+    background: rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 16px 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .jogo-letra {
+    font-family: 'Fredoka One', cursive;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--purple); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+  .jogo-frase { font-weight: 700; font-size: 1rem; flex: 1; }
+  .jogo-btns { display: flex; gap: 8px; }
+  .jogo-btn {
+    font-family: 'Fredoka One', cursive;
+    padding: 6px 14px; border: none; border-radius: 50px;
+    cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+  }
+  .jogo-btn.sim { background: var(--green); color: var(--dark); }
+  .jogo-btn.nao { background: rgba(255,255,255,0.15); color: white; }
+  .jogo-btn.correct { animation: bounce 0.5s; box-shadow: 0 0 20px rgba(6,214,160,0.6); }
+  .jogo-btn.wrong { animation: shake 0.4s; }
+  @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+  /* ══════════════════════════════
+     SLIDE 9 — DESAFIO DUPLAS
+  ══════════════════════════════ */
+  #s9 { background: linear-gradient(135deg, #002B1A, #004D2E); }
+  .desafio-cats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; max-width: 560px; width: 100%; margin: 18px 0;
+  }
+  .desafio-cat {
+    background: rgba(6,214,160,0.1);
+    border: 2px dashed rgba(6,214,160,0.4);
+    border-radius: 16px; padding: 16px;
+    text-align: center; font-weight: 700;
+    transition: all 0.3s;
+  }
+  .desafio-cat .d-icon { font-size: 2rem; }
+  .desafio-cat .d-name { font-size: 0.9rem; margin-top: 6px; }
+  .timer-box {
+    background: var(--green); color: var(--dark);
+    border-radius: 50px; padding: 14px 32px;
+    font-family: 'Fredoka One', cursive; font-size: 1.5rem;
+    cursor: pointer; transition: transform 0.2s;
+    margin-top: 8px;
+  }
+  .timer-box:hover { transform: scale(1.05); }
+
+  /* ══════════════════════════════
+     SLIDE 10 — ERRO ENGRAÇADO
+  ══════════════════════════════ */
+  #s10 { background: linear-gradient(135deg, #2A0000, #5C1111); }
+  .erro-bubble {
+    background: rgba(255,255,255,0.95); color: #222;
+    border-radius: 24px; padding: 30px 40px;
+    max-width: 500px; text-align: center;
+    position: relative;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+  }
+  .erro-bubble::after {
+    content: '';
+    position: absolute; bottom: -20px; left: 50%;
+    transform: translateX(-50%);
+    border: 12px solid transparent;
+    border-top-color: rgba(255,255,255,0.95);
+  }
+  .erro-frase { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--orange); }
+  .erro-pergunta { font-size: 1rem; color: #555; margin-top: 12px; font-weight: 600; }
+  .erro-person { font-size: 5rem; margin-top: 30px; }
+  .erro-explic {
+    margin-top: 24px;
+    background: rgba(255,107,53,0.15);
+    border: 2px solid var(--orange);
+    border-radius: 16px; padding: 14px 24px;
+    font-weight: 700; text-align: center;
+  }
+
+  /* ══════════════════════════════
+     SLIDE 11 — QUIZ
+  ══════════════════════════════ */
+  #s11 { background: linear-gradient(135deg, #0A001A, #200040); }
+  .quiz-badge {
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    color: var(--dark); padding: 6px 20px;
+    border-radius: 50px; font-family: 'Fredoka One', cursive;
+    font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 14px;
+  }
+  .quiz-q {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    text-align: center; margin-bottom: 8px;
+  }
+  .quiz-context {
+    font-size: 1.4rem; font-weight: 800;
+    color: var(--yellow); margin-bottom: 20px;
+    text-align: center; font-style: italic;
+  }
+  .quiz-opts { display: flex; flex-direction: column; gap: 10px; max-width: 520px; width: 100%; }
+  .quiz-opt {
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 14px; padding: 14px 20px;
+    font-weight: 700; font-size: 1rem;
+    cursor: pointer; transition: all 0.25s;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .quiz-opt:hover { border-color: var(--purple); background: rgba(108,99,255,0.2); }
+  .quiz-opt .opt-letter {
+    background: var(--purple); width: 32px; height: 32px;
+    border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-family: 'Fredoka One', cursive;
+    flex-shrink: 0; font-size: 1rem;
+  }
+  .quiz-opt.correct-ans { border-color: var(--green); background: rgba(6,214,160,0.2); }
+  .quiz-opt.correct-ans .opt-letter { background: var(--green); color: var(--dark); }
+  .quiz-opt.wrong-ans { border-color: var(--pink); background: rgba(255,77,141,0.15); opacity: 0.5; }
+  .quiz-nav { display: flex; gap: 12px; margin-top: 16px; }
+  .quiz-nav button {
+    font-family: 'Fredoka One', cursive;
+    padding: 10px 24px; border: none;
+    border-radius: 50px; cursor: pointer; font-size: 0.95rem;
+    transition: transform 0.15s;
+  }
+  .quiz-nav button:hover { transform: scale(1.05); }
+  #q-prev { background: rgba(255,255,255,0.12); color: white; }
+  #q-next { background: var(--yellow); color: var(--dark); }
+
+  /* ══════════════════════════════
+     SLIDE 12 — RESUMÃO
+  ══════════════════════════════ */
+  #s12 { background: linear-gradient(135deg, #001A33, #002D56); }
+  .resumo-items { display: flex; flex-direction: column; gap: 14px; max-width: 560px; width: 100%; margin-top: 20px; }
+  .resumo-item {
+    background: rgba(255,255,255,0.07);
+    border-left: 5px solid var(--yellow);
+    border-radius: 0 16px 16px 0;
+    padding: 16px 22px;
+    font-size: 1.05rem; font-weight: 700;
+    display: flex; align-items: center; gap: 12px;
+    animation: slideIn 0.5s ease both;
+  }
+  .resumo-item:nth-child(2) { border-color: var(--green); animation-delay: 0.1s; }
+  .resumo-item:nth-child(3) { border-color: var(--pink); animation-delay: 0.2s; }
+  @keyframes slideIn {
+    from { transform: translateX(-30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  .resumo-icon { font-size: 1.5rem; }
+
+  /* ══════════════════════════════
+     SLIDE 13 — ENCERRAMENTO
+  ══════════════════════════════ */
+  #s13 {
+    background: radial-gradient(ellipse at center, #1A0533 0%, #0D0020 70%);
+    overflow: hidden;
+  }
+  .confetti-wrapper {
+    position: absolute; inset: 0;
+    pointer-events: none; overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute; width: 10px; height: 10px;
+    border-radius: 2px;
+    animation: confettiFall linear infinite;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+  .end-star { font-size: 4rem; animation: spin 4s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .end-frase {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(1.3rem, 3.5vw, 2.2rem);
+    text-align: center;
+    background: linear-gradient(135deg, var(--yellow), var(--orange), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    max-width: 700px; line-height: 1.3;
+    margin: 16px 0;
+  }
+  .end-credits {
+    font-size: 0.95rem; opacity: 0.5; margin-top: 20px; text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="counter"></div>
+
+<div id="slides">
+
+  <!-- SLIDE 1 — CAPA -->
+  <div class="slide active" id="s1">
+    <div class="capa-emoji">🎭</div>
+    <div class="capa-title">METONÍMIA</div>
+    <div class="capa-tag">Quando uma palavra substitui outra</div>
+    <div class="capa-fala">
+      💬 "Hoje vamos descobrir como usamos metonímia SEM perceber todos os dias!"
+    </div>
+  </div>
+
+  <!-- SLIDE 2 — QUEBRA-GELO -->
+  <div class="slide" id="s2">
+    <div class="slide-title">❓ Você já falou alguma dessas frases?</div>
+    <div class="frases-grid">
+      <div class="frase-card" onclick="this.classList.toggle('selected')">🥛 "Vou tomar um Danone."</div>
+      <div class="frase-card" onclick="this.classList.toggle('selected')">🧹 "Minha mãe comprou Bombril."</div>
+      <div class="frase-card" onclick="this.classList.toggle('selected')">🎵 "Escuto Ana Castela."</div>
+      <div class="frase-card" onclick="this.classList.toggle('selected')">⚽ "O Brasil ganhou!"</div>
+    </div>
+    <button id="reveal-btn" onclick="document.getElementById('reveal-msg').classList.add('show')">
+      🙋 Clique após levantar a mão!
+    </button>
+    <div class="reveal-box" id="reveal-msg">
+      👉 Então você já usou <strong>metonímia</strong>! Parabéns! 🎉
+    </div>
+  </div>
+
+  <!-- SLIDE 3 — O QUE É? -->
+  <div class="slide" id="s3">
+    <div class="slide-title">📚 O que é Metonímia?</div>
+    <div class="def-box">
+      Metonímia é quando trocamos uma palavra por outra que tenha <strong>relação com ela</strong>.
+    </div>
+    <div class="exemplo-chain">
+      <div class="chain-item">
+        <span>✍️</span>
+        "Li Machado de Assis"
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-item striked">
+        <span>👨</span>
+        O homem?
+      </div>
+      <div class="chain-arrow">❌</div>
+      <div class="chain-item">
+        <span>📖</span>
+        A obra/livro dele!
+      </div>
+    </div>
+    <p style="margin-top:18px; opacity:0.7; font-size:0.95rem; text-align:center;">
+      A palavra "Machado de Assis" <strong>substituiu</strong> a palavra "livros"
+    </p>
+  </div>
+
+  <!-- SLIDE 4 — EXPLICAÇÃO VISUAL -->
+  <div class="slide" id="s4">
+    <div class="slide-title">🔄 Como funciona?</div>
+    <div class="visual-split">
+      <div class="visual-card">
+        <div class="v-emoji">👨‍💼</div>
+        <div class="v-label">Machado de Assis</div>
+        <small style="opacity:0.6">o autor</small>
+      </div>
+      <div class="visual-middle">
+        <span class="arrow">⇄</span>
+        <div style="font-size:0.85rem; opacity:0.8; margin-top:4px">autor no lugar<br>da obra</div>
+      </div>
+      <div class="visual-card" style="border-color: rgba(255,217,61,0.4);">
+        <div class="v-emoji">📚</div>
+        <div class="v-label">Livros dele</div>
+        <small style="opacity:0.6">a obra</small>
+      </div>
+    </div>
+    <div class="swap-label">🔄 Troca inteligente!</div>
+    <p style="margin-top:16px; opacity:0.7; text-align:center; font-size:0.95rem; max-width:500px;">
+      "A metonímia funciona como uma troca inteligente — usamos uma palavra conhecida no lugar de outra, por causa da relação entre elas."
+    </p>
+  </div>
+
+  <!-- SLIDE 5 — TIPOS -->
+  <div class="slide" id="s5">
+    <div class="slide-title">📋 Tipos mais comuns</div>
+    <div class="tipos-grid">
+      <div class="tipo-card">
+        <div class="t-head">👤 Autor pela obra</div>
+        <div class="t-ex">"Li Harry Potter."</div>
+      </div>
+      <div class="tipo-card">
+        <div class="t-head">🌎 Lugar pelas pessoas</div>
+        <div class="t-ex">"O estádio gritou."</div>
+      </div>
+      <div class="tipo-card">
+        <div class="t-head">🏷️ Marca pelo produto</div>
+        <div class="t-ex">"Pegue a Gillette."</div>
+      </div>
+      <div class="tipo-card">
+        <div class="t-head">🧠 Parte pelo todo</div>
+        <div class="t-ex">"Precisamos de mais mãos."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — DETETIVES -->
+  <div class="slide" id="s6">
+    <div class="slide-title">🕵️ Detetives da Metonímia!</div>
+    <p class="slide-sub" style="margin-bottom:0">Clique nas frases para revelar a resposta 👇</p>
+    <div class="detetive-cards">
+      <div class="det-card" onclick="this.classList.toggle('revealed')">
+        <div class="det-frase">1. "A sala ficou em silêncio."</div>
+        <div class="det-resp">✅ "Sala" substitui as <strong>pessoas</strong> dentro dela — lugar pelas pessoas!</div>
+      </div>
+      <div class="det-card" onclick="this.classList.toggle('revealed')">
+        <div class="det-frase">2. "Comprei um Nescau."</div>
+        <div class="det-resp">✅ "Nescau" é uma <strong>marca</strong> usada para dizer "achocolatado" — marca pelo produto!</div>
+      </div>
+      <div class="det-card" onclick="this.classList.toggle('revealed')">
+        <div class="det-frase">3. "O Maracanã explodiu."</div>
+        <div class="det-resp">✅ "Maracanã" substitui os <strong>torcedores</strong> — lugar pelas pessoas!</div>
+      </div>
+    </div>
+    <p class="tap-hint">👆 Toque em cada frase para revelar</p>
+  </div>
+
+  <!-- SLIDE 7 — MEME -->
+  <div class="slide" id="s7">
+    <div class="meme-box">
+      <div class="meme-person">👩</div>
+      <div class="meme-text">"Pega o Bombril!"</div>
+      <div class="meme-react">😐</div>
+      <div class="meme-resp">"Mas qual deles???"</div>
+    </div>
+    <div class="meme-explic">
+      🏷️ <strong>Marca → Objeto</strong><br>
+      "Bombril" é uma marca, mas usamos como se fosse o produto em si!
+    </div>
+  </div>
+
+  <!-- SLIDE 8 — METONÍMIA OU NÃO? -->
+  <div class="slide" id="s8">
+    <div class="slide-title">✅❌ Metonímia ou não?</div>
+    <div class="jogo-items">
+      <div class="jogo-item">
+        <div class="jogo-letra">A</div>
+        <div class="jogo-frase">"O Brasil venceu o jogo."</div>
+        <div class="jogo-btns">
+          <button class="jogo-btn sim" onclick="checkJogo(this, true, true)">✅ Sim</button>
+          <button class="jogo-btn nao" onclick="checkJogo(this, false, true)">❌ Não</button>
+        </div>
+      </div>
+      <div class="jogo-item">
+        <div class="jogo-letra">B</div>
+        <div class="jogo-frase">"A lua estava linda."</div>
+        <div class="jogo-btns">
+          <button class="jogo-btn sim" onclick="checkJogo(this, true, false)">✅ Sim</button>
+          <button class="jogo-btn nao" onclick="checkJogo(this, false, false)">❌ Não</button>
+        </div>
+      </div>
+      <div class="jogo-item">
+        <div class="jogo-letra">C</div>
+        <div class="jogo-frase">"Vou ler Clarice Lispector."</div>
+        <div class="jogo-btns">
+          <button class="jogo-btn sim" onclick="checkJogo(this, true, true)">✅ Sim</button>
+          <button class="jogo-btn nao" onclick="checkJogo(this, false, true)">❌ Não</button>
+        </div>
+      </div>
+      <div class="jogo-item">
+        <div class="jogo-letra">D</div>
+        <div class="jogo-frase">"Meu cachorro dormiu."</div>
+        <div class="jogo-btns">
+          <button class="jogo-btn sim" onclick="checkJogo(this, true, false)">✅ Sim</button>
+          <button class="jogo-btn nao" onclick="checkJogo(this, false, false)">❌ Não</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9 — DESAFIO DUPLAS -->
+  <div class="slide" id="s9">
+    <div class="slide-title">👫 Desafio em Duplas!</div>
+    <p class="slide-sub">Inventem uma frase com metonímia usando uma das categorias:</p>
+    <div class="desafio-cats">
+      <div class="desafio-cat"><div class="d-icon">🏷️</div><div class="d-name">Marca</div></div>
+      <div class="desafio-cat"><div class="d-icon">✍️</div><div class="d-name">Autor</div></div>
+      <div class="desafio-cat"><div class="d-icon">🌎</div><div class="d-name">Lugar</div></div>
+      <div class="desafio-cat"><div class="d-icon">🔧</div><div class="d-name">Objeto</div></div>
+    </div>
+    <div class="timer-box" id="timer-btn" onclick="startTimer()">
+      ⏱️ Iniciar: <span id="timer-display">2:00</span>
+    </div>
+    <p style="opacity:0.5; font-size:0.85rem; margin-top:10px;">Clique para iniciar o contador de 2 minutos</p>
+  </div>
+
+  <!-- SLIDE 10 — ERRO ENGRAÇADO -->
+  <div class="slide" id="s10">
+    <div class="meme-box erro-bubble" style="max-width:500px; background:rgba(255,255,255,0.95); color:#222;">
+      <div class="erro-frase">🎤 "Escuto Ana Castela."</div>
+      <div class="erro-pergunta">Você coloca a cantora dentro do fone de ouvido? 😂</div>
+    </div>
+    <div class="erro-person">🎧</div>
+    <div class="erro-explic">
+      🎵 <strong>Cantora → Músicas</strong><br>
+      A turma ri e entende a troca!<br>
+      <small style="opacity:0.7">Usamos o nome da cantora para falar de suas músicas.</small>
+    </div>
+  </div>
+
+  <!-- SLIDE 11 — QUIZ -->
+  <div class="slide" id="s11">
+    <div class="quiz-badge">🎮 QUIZ FINAL</div>
+    <div id="quiz-content"></div>
+    <div class="quiz-nav">
+      <button id="q-prev" onclick="quizPrev()">← Anterior</button>
+      <button id="q-next" onclick="quizNext()">Próxima →</button>
+    </div>
+  </div>
+
+  <!-- SLIDE 12 — RESUMÃO -->
+  <div class="slide" id="s12">
+    <div class="slide-title">📌 Resumão</div>
+    <p style="font-size:1.1rem; font-weight:700; opacity:0.8;">Metonímia é...</p>
+    <div class="resumo-items">
+      <div class="resumo-item"><span class="resumo-icon">🔄</span>Uma <strong>troca de palavras</strong></div>
+      <div class="resumo-item"><span class="resumo-icon">🔗</span>Baseada em <strong>relação de sentido</strong></div>
+      <div class="resumo-item"><span class="resumo-icon">💬</span>Usada no <strong>dia a dia</strong> sem perceber!</div>
+    </div>
+    <div style="margin-top:20px; background:rgba(255,217,61,0.15); border:2px solid var(--yellow); border-radius:16px; padding:14px 24px; font-weight:700; text-align:center; max-width:500px;">
+      🏷️ Danone → 👤 Autor → 🌎 Estádio → 🧠 Mãos
+    </div>
+  </div>
+
+  <!-- SLIDE 13 — ENCERRAMENTO -->
+  <div class="slide" id="s13">
+    <div class="confetti-wrapper" id="confetti"></div>
+    <div class="end-star">⭐</div>
+    <div class="end-frase">
+      "Depois de hoje, você nunca mais ouvirá certas frases do mesmo jeito!"
+    </div>
+    <div style="font-size:3rem; margin:10px 0;">🧠✨🎉</div>
+    <div style="background:rgba(255,255,255,0.08); border-radius:50px; padding:12px 30px; font-family:'Fredoka One',cursive; font-size:1rem; letter-spacing:1px;">
+      Você é um(a) DETETIVE da língua portuguesa!
+    </div>
+    <div class="end-credits">Metonímia • 6º Ano • Língua Portuguesa</div>
+  </div>
+
+</div><!-- /slides -->
+
+<!-- NAV -->
+<div class="nav">
+  <button id="btn-prev" onclick="changeSlide(-1)">← Anterior</button>
+  <button id="btn-next" onclick="changeSlide(1)">Próximo →</button>
+</div>
+
+<script>
+/* ── SLIDES ── */
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+const total = slides.length;
+
+function updateSlide() {
+  slides.forEach((s, i) => s.classList.toggle('active', i === current));
+  document.getElementById('progress-bar').style.width = ((current + 1) / total * 100) + '%';
+  document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+  document.getElementById('btn-prev').style.opacity = current === 0 ? '0.3' : '1';
+  document.getElementById('btn-next').textContent = current === total - 1 ? '✓ Fim' : 'Próximo →';
+  if (current === 12) spawnConfetti();
+  if (current === 10) renderQuiz();
+}
+
+function changeSlide(dir) {
+  const next = current + dir;
+  if (next >= 0 && next < total) { current = next; updateSlide(); }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+});
+
+updateSlide();
+
+/* ── JOGO METONÍMIA OU NÃO ── */
+function checkJogo(btn, userSaidSim, correct) {
+  const btns = btn.parentElement.querySelectorAll('.jogo-btn');
+  btns.forEach(b => b.disabled = true);
+  const gotRight = (userSaidSim === correct);
+  btn.classList.add(gotRight ? 'correct' : 'wrong');
+}
+
+/* ── TIMER DUPLAS ── */
+let timerInterval;
+function startTimer() {
+  clearInterval(timerInterval);
+  let secs = 120;
+  const disp = document.getElementById('timer-display');
+  timerInterval = setInterval(() => {
+    secs--;
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    disp.textContent = m + ':' + String(s).padStart(2, '0');
+    if (secs <= 0) { clearInterval(timerInterval); disp.textContent = '⏰ FIM!'; }
+  }, 1000);
+}
+
+/* ── QUIZ ── */
+const questions = [
+  {
+    ctx: '"Comprei um Cotonete."',
+    q: 'Que tipo de metonímia é essa?',
+    opts: ['Pessoa', 'Marca', 'Lugar', 'Animal'],
+    correct: 1
+  },
+  {
+    ctx: '"O estádio vibrou."',
+    q: 'A palavra "estádio" representa:',
+    opts: ['O cimento', 'As cadeiras', 'As pessoas', 'Os jogadores'],
+    correct: 2
+  },
+  {
+    ctx: '"Vou ler Machado de Assis."',
+    q: 'Qual é a troca?',
+    opts: ['Lugar pelas pessoas', 'Autor pela obra', 'Parte pelo todo', 'Marca pelo produto'],
+    correct: 1
+  }
+];
+
+let qIdx = 0;
+let answered = [null, null, null];
+
+function renderQuiz() {
+  const q = questions[qIdx];
+  const content = document.getElementById('quiz-content');
+  content.innerHTML = `
+    <div class="quiz-q">Pergunta ${qIdx + 1} de ${questions.length}</div>
+    <div class="quiz-context">${q.ctx}</div>
+    <p style="text-align:center;margin-bottom:14px;font-weight:700;opacity:0.8;">${q.q}</p>
+    <div class="quiz-opts">
+      ${q.opts.map((o, i) => `
+        <div class="quiz-opt ${answered[qIdx] !== null ? (i === q.correct ? 'correct-ans' : (i === answered[qIdx] ? 'wrong-ans' : '')) : ''}"
+             onclick="answerQuiz(${i})" id="qopt-${i}">
+          <div class="opt-letter">${'ABCD'[i]}</div>
+          ${o}
+        </div>
+      `).join('')}
+    </div>
+  `;
+  document.getElementById('q-prev').style.display = qIdx === 0 ? 'none' : 'inline-block';
+  document.getElementById('q-next').textContent = qIdx === questions.length - 1 ? '🎉 Ver resultado' : 'Próxima →';
+}
+
+function answerQuiz(i) {
+  if (answered[qIdx] !== null) return;
+  answered[qIdx] = i;
+  renderQuiz();
+}
+
+function quizNext() {
+  if (qIdx < questions.length - 1) { qIdx++; renderQuiz(); }
+  else {
+    const score = answered.filter((a, i) => a === questions[i].correct).length;
+    document.getElementById('quiz-content').innerHTML = `
+      <div style="text-align:center">
+        <div style="font-size:4rem">${score === questions.length ? '🏆' : score >= 2 ? '⭐' : '💪'}</div>
+        <div class="quiz-q">Você acertou ${score} de ${questions.length}!</div>
+        <div style="margin-top:12px;opacity:0.7">${score === questions.length ? 'Perfeito! Você é um detetive da metonímia!' : 'Bom trabalho! Continue praticando!'}</div>
+      </div>
+    `;
+    document.getElementById('q-next').style.display = 'none';
+  }
+}
+
+function quizPrev() {
+  if (qIdx > 0) { qIdx--; renderQuiz(); }
+}
+
+/* ── CONFETTI ── */
+function spawnConfetti() {
+  const container = document.getElementById('confetti');
+  container.innerHTML = '';
+  const colors = ['#FFD93D','#FF6B35','#6C63FF','#FF4D8D','#06D6A0','#fff'];
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = '-20px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width = (8 + Math.random() * 10) + 'px';
+    p.style.height = (8 + Math.random() * 10) + 'px';
+    p.style.animationDuration = (3 + Math.random() * 4) + 's';
+    p.style.animationDelay = (Math.random() * 3) + 's';
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    container.appendChild(p);
+  }
+}
+</script>
+</body>
+</html>
